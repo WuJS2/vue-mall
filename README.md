@@ -50,3 +50,41 @@ module.exports = {
 
 基于本次完成的代码存档
 
+`git tag -a v0.0.1 -m '第一个小版本'`
+
+`git push origin v0.0.1`
+
+## 功能开发
+
+### 首页
+
+#### 封装导航栏组件 `NavBar.vue`
+
+#### 请求首页默认数据
+
+- 安装 `axios`，`npm install axios --save`
+
+- 封装统一的 `request.js`，
+
+- 封装 `home.js`
+
+- 在 `home.vue` 中引入 `home.js`
+
+  `import {getHomeMultidata,getHomeGoods} from "../../network/home"`
+
+- 请求数据并保存
+
+#### 使用轮播图组件 `Swiper.vue`
+
+#### 封装推荐信息 `RecommendView.vue`
+
+#### 封装本周流行 `FeatureView.vue`
+
+#### 封装 `TabControl.vue`
+
+#### 请求首页商品数据，封装 `GoodsList.vue`
+
+#### 安装 `better-scroll` 插件
+
+`npm install better-scroll --save`
+
