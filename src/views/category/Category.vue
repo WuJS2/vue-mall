@@ -115,7 +115,22 @@ export default {
     }
   },
   mounted() {
-    this.scroll = new BScroll(document.querySelector('.wrapper'));
+    this.scroll = new BScroll(document.querySelector('.wrapper'),{
+      // 0,1 都是不侦测实时的位置
+      // 2 在手指滚动的过程中侦测，手指离开后的惯性滚动过程中不侦测
+      // 3 只要是滚动，都侦测
+      probeType:3,
+      // 下拉加载更多
+      pullUpLoad: true
+    });
+
+    this.scroll.on('scroll',position=>{
+      console.log(position)
+    })
+
+    this.scroll.on('pullingUp',()=>{
+      console.log("上拉加载更多")
+    })
   }
 };
 </script>

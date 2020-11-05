@@ -3,13 +3,16 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <home-swiper :banners="banners"/>
-    <recommend-view :recommends="recommends"/>
-    <feature-view/>
-    <tab-control class="tab-control"
-                 :titles="['流行', '新款', '精选']"
-                 @tabClick="tabClick"/>
-    <good-list :goods="showGoods"/>
+    <scroll class="content" ref="scroll" :probe-type="3" @scrollevent = "contentScroll">
+      <home-swiper :banners="banners"/>
+      <recommend-view :recommends="recommends"/>
+      <feature-view/>
+      <tab-control class="tab-control"
+                   :titles="['流行', '新款', '精选']"
+                   @tabClick="tabClick"/>
+      <good-list :goods="showGoods"/>
+    </scroll>
+  <back-top @click.native="backClick" v-show="isShow"/>
   </div>
 </template>
 
@@ -20,18 +23,22 @@ import RecommendView from './childComps/RecommendView'
 import FeatureView from './childComps/FeatureView'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodList from 'components/content/goods/GoodsList'
+import Scroll from "components/common/scroll/Scroll";
+import BackTop from "components/content/backTop/BackTop";
 
 import {getHomeMultidata, getHomeGoods} from "../../network/home"
 
 export default {
   name: "Home",
   components: {
+    BackTop,
     NavBar,
     HomeSwiper,
     RecommendView,
     FeatureView,
     TabControl,
-    GoodList
+    GoodList,
+    Scroll
   },
   data() {
     return {
@@ -43,6 +50,7 @@ export default {
         'sell': {page: 0, list: []},
       },
       currentType: 'pop',
+      isShow:false
     }
   },
   computed: {
@@ -84,20 +92,63 @@ export default {
         this.recommends = res.data.recommend.list;
       })
     },
-    getHomeGoods(type){
+    getHomeGoods(type) {
       let page = this.goods[type].page + 1;
-      getHomeGoods(type,page).then(res=>{
+      getHomeGoods(type, page).then(res => {
         this.goods[type].list.push(...res.data.list);
         this.goods[type].page += 1;
       })
+    },
+    backClick(){
+      //默认组件无法监听点击事件，可以加上 .native 修饰符
+      // console.log('backClick')
+      // this.$refs.scroll.scroll.scrollTo(0, 0, 500);
+      this.$refs.scroll.scrollTo(0, 0, 500);
+    },
+    contentScroll(position){
+      // console.log(position)
+      this.isShow = (-position.y) > 1000
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
+#home {
+  /*padding-top: 44px;*/
+  height: 100vh;
+  position: relative;
+}
+
 .home-nav {
   background-color: var(--color-tint);
-  color: #fff
+  color: #fff;
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 9;
 }
+
+.tab-control {
+  position: sticky;
+  top: 44px;
+  z-index: 9;
+}
+.content {
+  overflow: hidden;
+
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
+}
+
+/*.content {*/
+/*  height: calc(100% - 93px);*/
+/*  overflow: hidden;*/
+/*  margin-top: 44px;*/
+/*}*/
 </style>
