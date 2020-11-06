@@ -88,3 +88,5 @@ module.exports = {
 
 `npm install better-scroll --save`
 
+完成滚动效果以及下拉加载更多
+
