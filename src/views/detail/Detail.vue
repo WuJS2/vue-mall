@@ -1,9 +1,15 @@
 <template>
   <div id="detail">
-    <detail-nav-bar></detail-nav-bar>
-    <detail-swiper :top-images="topImages"></detail-swiper>
-    <detail-base-info :goods="goods"/>
-    <detail-shop-info :shop="shop"/>
+    <detail-nav-bar class="detail-nav"></detail-nav-bar>
+    <scroll class="content" ref="scroll">
+      <detail-swiper :top-images="topImages"></detail-swiper>
+      <detail-base-info :goods="goods"/>
+      <detail-shop-info :shop="shop"/>
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"/>
+      <detail-param-info :param-info="paramInfo"/>
+      <detail-comment-info :comment-info="commentInfo"/>
+      <goods-list :goods="recommend"/>
+    </scroll>
   </div>
 </template>
 
@@ -13,8 +19,13 @@ import DetailNavBar from "./childComps/DetailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
+import Scroll from "components/common/scroll/Scroll";
+import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
+import DetailParamInfo from "./childComps/DetailParamInfo";
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import GoodsList from "components/content/goods/GoodsList";
 
-import {getDetail,Goods,Shop} from "network/detail";
+import {getDetail, Goods, GoodsParam,Shop,getRecommand} from "network/detail";
 
 export default {
   name: "Detail",
@@ -23,14 +34,23 @@ export default {
       iid: null,
       topImages: [],
       goods: {},
-      shop:{}
+      shop: {},
+      detailInfo: {},
+      paramInfo: {},
+      commentInfo: {},
+      recommend: []
     }
   },
   components: {
+    GoodsList,
+    DetailParamInfo,
     DetailNavBar,
     DetailSwiper,
     DetailBaseInfo,
-    DetailShopInfo
+    DetailShopInfo,
+    DetailGoodsInfo,
+    DetailCommentInfo,
+    Scroll
   },
   created() {
     // 1. 保存传入的iid
@@ -46,15 +66,53 @@ export default {
       // console.log(this.topImages)
 
       // 2. 获取商品信息
-      this.goods = new Goods(data.itemInfo,data.columns,data.shopInfo.services)
+      this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services)
 
       // 3. 创建店铺信息的对象
       this.shop = new Shop(data.shopInfo);
+
+      // 4. 获取商品信息
+      this.detailInfo = data.detailInfo
+
+      // 5. 取出参数信息
+      this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule);
+
+      // 6. 取出评论的信息
+      console.log(data)
+      if (data.rate.cRate !== 0) {
+        this.commentInfo = data.rate.list[0]
+      }
     });
+
+    // 3. 请求推荐数据
+    getRecommand().then(res => {
+      // console.log(res);
+      this.recommend = res.data.list
+    });
+  },
+  methods:{
+    imageLoad() {
+      this.$refs.scroll.refresh();
+    }
   }
 }
 </script>
 
 <style scoped>
+#detail {
+  position: relative;
+  z-index: 9;
+  background-color: #fff;
+  height: 100vh;
+}
 
+.detail-nav {
+  position: relative;
+  z-index: 9;
+  background-color: #fff;
+}
+
+.content {
+  height: calc(100% - 44px);
+}
 </style>
