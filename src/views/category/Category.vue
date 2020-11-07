@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper11">
     <ul class="content">
       <li>分类列表1</li>
       <li>分类列表2</li>
@@ -115,7 +115,7 @@ export default {
     }
   },
   mounted() {
-    this.scroll = new BScroll(document.querySelector('.wrapper'),{
+    this.scroll = new BScroll(document.querySelector('.wrapper11'),{
       // 0,1 都是不侦测实时的位置
       // 2 在手指滚动的过程中侦测，手指离开后的惯性滚动过程中不侦测
       // 3 只要是滚动，都侦测
@@ -136,7 +136,7 @@ export default {
 </script>
 
 <style>
-.wrapper{
+.wrapper11{
   height: 150px;
   background: red;
 

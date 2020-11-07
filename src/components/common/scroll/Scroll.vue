@@ -34,6 +34,7 @@ export default {
       // 3 只要是滚动，都侦测
       probeType: this.probeType,
       pullUpLoad: this.pullUpLoad,
+      click:true,
       observeDOM: true
     });
 
