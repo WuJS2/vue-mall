@@ -90,3 +90,22 @@ module.exports = {
 
 完成滚动效果以及下拉加载更多
 
+1. java 基础
+
+Java基础语法-》面向对象-》集合-》IO-》线程与并发-》异常-》网络编程
+
+2. 数据库
+ MySQL-》Oracle-》JDBC-》C3PO-》Druid
+ 
+ 3. 前端技术
+ HTML->CSS->JavaScript->jQuery->Ajax->Vue->webpack->elementUI->微信小程序
+ 
+ 4. 动态网页
+ Servlet->JSP->EL->JSTL->Cookie->Session->fillter->Listener
+
+5. 编程强化
+
+设计模式->JVM优化->数据结构和算法->多线程高级->MINA->Netty->NIO
+
+6. 软件项目管理
+Maven->SVN->Git->码云->Jenkins->Sonar
