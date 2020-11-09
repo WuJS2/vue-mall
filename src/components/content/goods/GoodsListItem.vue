@@ -29,7 +29,12 @@
       imageLoad() {
         //事件总线，用于在scroll中调用
         //每张图片加载完成之后，刷新scroll中的高度
-        this.$bus.$emit('itemImageLoad');
+        //根据路由返回各自的图片加载完成事件
+        if (this.$route.path.indexOf('/home')) {
+          this.$bus.$emit('homeItemImageLoad');
+        }else if (this.$route.path.indexOf("/detail")) {
+          this.$bus.$emit('detailItemImageLoad');
+        }
       },
       itemClick(){
         this.$router.push('/detail/'+this.goodsItem.iid)

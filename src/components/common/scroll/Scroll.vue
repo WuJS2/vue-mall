@@ -60,7 +60,7 @@ export default {
       this.scroll.finishPullUp();
     },
     refresh(){
-      console.log('00000000000')
+      // console.log('00000000000')
       this.scroll.refresh();
     }
   }

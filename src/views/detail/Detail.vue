@@ -1,14 +1,14 @@
 <template>
   <div id="detail">
-    <detail-nav-bar class="detail-nav"></detail-nav-bar>
-    <scroll class="content" ref="scroll">
+    <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="nav"/>
+    <scroll class="content" ref="scroll" :probe-type="2" @scrollevent="contentScroll">
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods="goods"/>
       <detail-shop-info :shop="shop"/>
       <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"/>
-      <detail-param-info :param-info="paramInfo"/>
-      <detail-comment-info :comment-info="commentInfo"/>
-      <goods-list :goods="recommend"/>
+      <detail-param-info ref="params" :param-info="paramInfo"/>
+      <detail-comment-info ref="comment" :comment-info="commentInfo"/>
+      <goods-list ref="recommend" :goods="recommend"/>
     </scroll>
   </div>
 </template>
@@ -25,7 +25,8 @@ import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import GoodsList from "components/content/goods/GoodsList";
 
-import {getDetail, Goods, GoodsParam,Shop,getRecommand} from "network/detail";
+import {getDetail, Goods, GoodsParam, Shop, getRecommand} from "network/detail";
+import {debounce} from "@/components/common/utils";
 
 export default {
   name: "Detail",
@@ -38,7 +39,10 @@ export default {
       detailInfo: {},
       paramInfo: {},
       commentInfo: {},
-      recommend: []
+      recommend: [],
+      themeTopYs: [],
+      getThemeTopY: null,//保存防抖的函数,
+      currentIndex: 0
     }
   },
   components: {
@@ -78,10 +82,34 @@ export default {
       this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule);
 
       // 6. 取出评论的信息
-      console.log(data)
+      // console.log(data)
       if (data.rate.cRate !== 0) {
         this.commentInfo = data.rate.list[0]
       }
+
+      // 在这里获取：值不对
+      // 原因：this.$refs.params.$el压根没有渲染
+      // this.themeTopYs = []
+      // this.themeTopYs.push(0);
+      // this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      // this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      // this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+
+
+      // 下一帧执行
+      this.$nextTick(() => {
+        // 在这里获取：值不对
+        // 不包含其中的图片
+        // 根据最新的数据，对应的 DOM 是已经被渲染出来
+        // 但是图片依旧是没有加载完（目前获取到 offsetTop 不包含其中的图片
+        //     this.themeTopYs = []
+        //     this.themeTopYs.push(0);
+        //     this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+        //     this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+        //     this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+        // console.log(this.themeTopYs)
+          }
+      );
     });
 
     // 3. 请求推荐数据
@@ -89,10 +117,55 @@ export default {
       // console.log(res);
       this.recommend = res.data.list
     });
+
+    this.getThemeTopY = debounce(() => {
+      this.themeTopYs = []
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop-44);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop-44);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop-44);
+      console.log(this.themeTopYs)
+    },100);
   },
-  methods:{
+  mounted() {
+    // 有些加了 v-if 判断，没值不会渲染，所以拿到的值时undefined
+    // this.themeTopYs.push(0);
+    // this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+    // this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+    // this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+    // console.log(this.themeTopYs)
+  },
+  updated() {
+    // this.themeTopYs = []
+    // this.themeTopYs.push(0);
+    // this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+    // this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+    // this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+    // console.log(this.themeTopYs)
+  },
+  methods: {
     imageLoad() {
       this.$refs.scroll.refresh();
+      this.getThemeTopY()
+    },
+    titleClick(index) {
+      // console.log(index)
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 100);
+    },
+    contentScroll(position) {
+      let positionY = -position.y;
+      let length = this.themeTopYs.length;
+      for (let i=0;i<length ;i++) {
+        // if (positionY > this.themeTopYs[i] && positionY < this.themeTopYs[i + 1]) {
+        //   console.log(i)
+        // }
+        if (this.currentIndex != i&& (i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i + 1]) ||
+            (i == length - 1 && positionY >= this.themeTopYs[i])) {
+          this.currentIndex = i
+          console.log(i)
+          this.$refs.nav.currentIndex = this.currentIndex//修改nav总选中的值
+        }
+      }
     }
   }
 }
