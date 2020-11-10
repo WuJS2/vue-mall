@@ -88,6 +88,9 @@ module.exports = {
 
 `npm install better-scroll --save`
 
+#### 安装 `vuex` 
+`npm install vuex --save`
+
 完成滚动效果以及下拉加载更多
 
 1. java 基础

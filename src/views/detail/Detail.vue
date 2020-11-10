@@ -10,6 +10,9 @@
       <detail-comment-info ref="comment" :comment-info="commentInfo"/>
       <goods-list ref="recommend" :goods="recommend"/>
     </scroll>
+    <detail-bottom-bar @addToCart="addToCart"/>
+    <back-top @click.native="backTop" class="back-top" v-show="isShowBackTop">
+    </back-top>
   </div>
 </template>
 
@@ -24,9 +27,13 @@ import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import GoodsList from "components/content/goods/GoodsList";
+import DetailBottomBar from "./childComps/DetailBottomBar";
+import BackTop from "components/content/backTop/BackTop";
+import {backTopMixin} from "@/network/mixin";
 
 import {getDetail, Goods, GoodsParam, Shop, getRecommand} from "network/detail";
 import {debounce} from "@/components/common/utils";
+import {BACKTOP_DISTANCE} from "@/components/common/const";
 
 export default {
   name: "Detail",
@@ -42,9 +49,10 @@ export default {
       recommend: [],
       themeTopYs: [],
       getThemeTopY: null,//保存防抖的函数,
-      currentIndex: 0
+      currentIndex: 0,
     }
   },
+  mixins: [backTopMixin],
   components: {
     GoodsList,
     DetailParamInfo,
@@ -54,6 +62,8 @@ export default {
     DetailShopInfo,
     DetailGoodsInfo,
     DetailCommentInfo,
+    DetailBottomBar,
+    BackTop,
     Scroll
   },
   created() {
@@ -154,6 +164,7 @@ export default {
     },
     contentScroll(position) {
       let positionY = -position.y;
+      this.isShowBackTop = positionY > BACKTOP_DISTANCE;
       let length = this.themeTopYs.length;
       for (let i=0;i<length ;i++) {
         // if (positionY > this.themeTopYs[i] && positionY < this.themeTopYs[i + 1]) {
@@ -166,6 +177,19 @@ export default {
           this.$refs.nav.currentIndex = this.currentIndex//修改nav总选中的值
         }
       }
+    },
+    addToCart() {
+      // console.log('---')
+      // 1. 获取购物车需要展示的信息
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title
+      product.desc = this.goods.desc
+      product.price = this.goods.oldPrice
+      product.iid = this.iid
+      console.log(this.goods)
+      console.log(product)
+      this.$store.commit('addCart', product);
     }
   }
 }
