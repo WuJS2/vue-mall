@@ -189,7 +189,7 @@ export default {
       product.iid = this.iid
       console.log(this.goods)
       console.log(product)
-      this.$store.commit('addCart', product);
+      this.$store.dispatch('addCart', product);
     }
   }
 }
